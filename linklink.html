@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LinkLink — Espace de travail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --primary:#6366f1;
+    --primary-dark:#4f46e5;
+    --accent:#ec4899;
+    --accent2:#06b6d4;
+    --dark:#0a0a1a;
+    --darker:#05050f;
+    --gray:#94a3b8;
+    --border:rgba(255,255,255,0.08);
+    --card:rgba(255,255,255,0.04);
+  }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'Inter',sans-serif;
+    background:var(--darker);
+    color:#fff;
+    overflow-x:hidden;
+    line-height:1.6;
+    min-height:100vh;
+  }
+  .bg-orbs { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+  .orb {
+    position:absolute; border-radius:50%; filter:blur(120px); opacity:0.3;
+    animation:float 24s ease-in-out infinite;
+  }
+  .orb1 { width:520px; height:520px; background:var(--primary); top:-180px; left:-120px; }
+  .orb2 { width:420px; height:420px; background:var(--accent); top:50%; right:-140px; animation-delay:-8s; }
+  .orb3 { width:460px; height:460px; background:var(--accent2); bottom:-140px; left:35%; animation-delay:-14s; }
+  @keyframes float {
+    0%,100% { transform:translate(0,0) scale(1); }
+    33% { transform:translate(60px,-40px) scale(1.1); }
+    66% { transform:translate(-40px,50px) scale(0.95); }
+  }
+  .container { max-width:1240px; margin:0 auto; padding:0 24px; position:relative; z-index:1; }
+
+  /* NAVBAR */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    padding:16px 0; backdrop-filter:blur(20px);
+    background:rgba(5,5,15,0.6);
+    border-bottom:1px solid transparent;
+    transition:all .3s ease;
+  }
+  nav.scrolled { border-bottom-color:var(--border); background:rgba(5,5,15,0.85); }
+  .nav-inner { display:flex; align-items:center; justify-content:space-between; }
+  .logo {
+    display:flex; align-items:center; gap:10px;
+    font-weight:800; font-size:22px; letter-spacing:-0.5px;
+  }
+  .logo-mark {
+    width:38px; height:38px; border-radius:11px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    display:grid; place-items:center; font-size:18px;
+    box-shadow:0 8px 24px rgba(99,102,241,0.4);
+  }
+  .nav-right { display:flex; align-items:center; gap:16px; }
+  .status-pill {
+    display:flex; align-items:center; gap:8px;
+    padding:7px 14px; border-radius:100px;
+    background:rgba(34,197,94,0.1);
+    border:1px solid rgba(34,197,94,0.25);
+    font-size:12.5px; color:#86efac; font-weight:500;
+  }
+  .status-pill .dot {
+    width:7px; height:7px; border-radius:50%; background:#22c55e;
+    box-shadow:0 0 10px #22c55e; animation:pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .btn {
+    padding:11px 22px; border-radius:11px; font-weight:600; font-size:14px;
+    text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    transition:all .25s ease; cursor:pointer; border:none; font-family:inherit;
+  }
+  .btn-primary {
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff;
+    box-shadow:0 8px 24px rgba(99,102,241,0.35);
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(99,102,241,0.5); }
+  .btn-ghost {
+    background:rgba(255,255,255,0.05);
+    color:#fff; border:1px solid var(--border);
+  }
+  .btn-ghost:hover { background:rgba(255,255,255,0.1); transform:translateY(-2px); }
+
+  /* HERO */
+  .hero { padding:150px 0 60px; text-align:center; }
+  .badge {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:8px 18px; border-radius:100px;
+    background:rgba(99,102,241,0.1);
+    border:1px solid rgba(99,102,241,0.3);
+    font-size:13px; font-weight:500; color:#c7d2fe;
+    margin-bottom:26px;
+    animation:fadeInUp .8s ease;
+  }
+  h1 {
+    font-size:clamp(34px,5.5vw,64px);
+    font-weight:900; letter-spacing:-2px; line-height:1.08;
+    margin-bottom:22px;
+    animation:fadeInUp .8s ease .1s backwards;
+  }
+  .gradient-text {
+    background:linear-gradient(135deg,#818cf8 0%,#ec4899 50%,#06b6d4 100%);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-size:200% auto;
+    animation:shine 6s linear infinite;
+  }
+  @keyframes shine { to { background-position:200% center; } }
+  .hero p {
+    font-size:clamp(15px,1.8vw,18px); color:var(--gray);
+    max-width:600px; margin:0 auto 40px;
+    animation:fadeInUp .8s ease .2s backwards;
+  }
+  .hero-cta {
+    display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+    animation:fadeInUp .8s ease .3s backwards;
+    margin-bottom:80px;
+  }
+  .btn-lg { padding:15px 30px; font-size:15px; border-radius:13px; }
+  @keyframes fadeInUp {
+    from { opacity:0; transform:translateY(30px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  /* DATE + GREETING */
+  .greeting {
+    text-align:left; max-width:1000px; margin:0 auto 32px;
+    animation:fadeInUp .8s ease .35s backwards;
+  }
+  .greeting h2 {
+    font-size:clamp(22px,3vw,32px); font-weight:800;
+    letter-spacing:-0.8px; margin-bottom:6px;
+  }
+  .greeting p { color:var(--gray); font-size:14.5px; }
+
+  /* DASHBOARD PREVIEW */
+  .dashboard-wrap {
+    max-width:1100px; margin:0 auto;
+    animation:fadeInUp .8s ease .4s backwards;
+  }
+  .dashboard {
+    background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+    border:1px solid var(--border);
+    border-radius:22px; padding:20px;
+    box-shadow:0 40px 80px rgba(0,0,0,0.6);
+  }
+  .dash-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding-bottom:16px; border-bottom:1px solid var(--border); margin-bottom:20px;
+  }
+  .dash-header h3 { font-size:15px; font-weight:700; }
+  .dash-tabs { display:flex; gap:6px; }
+  .dash-tab {
+    padding:7px 14px; border-radius:8px; font-size:12.5px;
+    color:var(--gray); font-weight:500; cursor:pointer;
+    transition:all .2s;
+  }
+  .dash-tab.active { background:rgba(99,102,241,0.15); color:#fff; }
+
+  .dash-grid {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:14px;
+  }
+  .kpi {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:18px;
+  }
+  .kpi-label { font-size:12px; color:var(--gray); margin-bottom:8px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; }
+  .kpi-value { font-size:26px; font-weight:800; letter-spacing:-1px; }
+  .kpi-value.purple { color:#818cf8; }
+  .kpi-value.pink { color:#ec4899; }
+  .kpi-value.cyan { color:#22d3ee; }
+  .kpi-value.green { color:#4ade80; }
+  .kpi-sub { font-size:11.5px; color:var(--gray); margin-top:6px; }
+
+  .dash-columns {
+    display:grid; grid-template-columns:1.5fr 1fr; gap:14px; margin-top:14px;
+  }
+  .panel {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:14px; padding:18px;
+  }
+  .panel-title {
+    font-size:13px; font-weight:700; margin-bottom:14px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .panel-title span { font-size:11.5px; color:var(--gray); font-weight:500; }
+  .task-row {
+    display:flex; align-items:center; gap:12px;
+    padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04);
+    font-size:13.5px;
+  }
+  .task-row:last-child { border-bottom:none; }
+  .task-check {
+    width:16px; height:16px; border-radius:5px;
+    border:1.5px solid rgba(255,255,255,0.2);
+    flex-shrink:0;
+  }
+  .task-check.done {
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    border-color:transparent;
+    display:grid; place-items:center;
+    font-size:10px; color:#fff;
+  }
+  .task-check.done::after { content:'✓'; font-weight:800; }
+  .task-label { flex:1; }
+  .task-label.done { color:var(--gray); text-decoration:line-through; }
+  .task-tag {
+    font-size:10.5px; padding:3px 9px; border-radius:100px;
+    font-weight:600;
+  }
+  .tag-purple { background:rgba(99,102,241,0.15); color:#a5b4fc; }
+  .tag-pink { background:rgba(236,72,153,0.15); color:#f9a8d4; }
+  .tag-cyan { background:rgba(6,182,212,0.15); color:#67e8f9; }
+  .tag-amber { background:rgba(245,158,11,0.15); color:#fcd34d; }
+
+  .member-row {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 0; font-size:13px;
+  }
+  .member-avatar {
+    width:30px; height:30px; border-radius:50%;
+    display:grid; place-items:center; font-size:11.5px; font-weight:700;
+    flex-shrink:0;
+  }
+  .ma1 { background:linear-gradient(135deg,#6366f1,#8b5cf6); }
+  .ma2 { background:linear-gradient(135deg,#ec4899,#f43f5e); }
+  .ma3 { background:linear-gradient(135deg,#06b6d4,#0ea5e9); }
+  .ma4 { background:linear-gradient(135deg,#f59e0b,#f97316); }
+  .ma5 { background:linear-gradient(135deg,#22c55e,#10b981); }
+  .ma6 { background:linear-gradient(135deg,#a855f7,#d946ef); }
+  .member-info { flex:1; }
+  .member-info strong { font-weight:600; font-size:13px; display:block; }
+  .member-info small { color:var(--gray); font-size:11.5px; }
+  .member-status {
+    width:8px; height:8px; border-radius:50%; background:#22c55e;
+  }
+  .member-status.away { background:#f59e0b; }
+  .member-status.off { background:#64748b; }
+
+  /* MODULES */
+  section { padding:100px 0; position:relative; z-index:1; }
+  .section-head { text-align:center; max-width:680px; margin:0 auto 56px; }
+  .section-tag {
+    display:inline-block; padding:6px 14px; border-radius:100px;
+    background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.25);
+    font-size:12px; font-weight:600; color:#c7d2fe;
+    letter-spacing:1.5px; text-transform:uppercase; margin-bottom:18px;
+  }
+  .section-title {
+    font-size:clamp(28px,4vw,46px); font-weight:800;
+    letter-spacing:-1.2px; line-height:1.12; margin-bottom:14px;
+  }
+  .section-sub { font-size:16px; color:var(--gray); }
+
+  .modules-grid {
+    display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
+  }
+  .module {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:18px; padding:28px 26px;
+    transition:all .3s ease; position:relative; overflow:hidden;
+    text-decoration:none; color:inherit;
+    display:block;
+  }
+  .module::before {
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(circle at top right,rgba(99,102,241,0.12),transparent 60%);
+    opacity:0; transition:opacity .3s;
+  }
+  .module:hover { transform:translateY(-6px); border-color:rgba(99,102,241,0.4); }
+  .module:hover::before { opacity:1; }
+  .module-icon {
+    width:52px; height:52px; border-radius:14px;
+    display:grid; place-items:center; font-size:24px;
+    margin-bottom:18px; position:relative; z-index:1;
+  }
+  .mi-1 { background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.2)); border:1px solid rgba(99,102,241,0.3); }
+  .mi-2 { background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(244,63,94,0.2)); border:1px solid rgba(236,72,153,0.3); }
+  .mi-3 { background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(14,165,233,0.2)); border:1px solid rgba(6,182,212,0.3); }
+  .mi-4 { background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(249,115,22,0.2)); border:1px solid rgba(245,158,11,0.3); }
+  .mi-5 { background:linear-gradient(135deg,rgba(34,197,94,0.2),rgba(16,185,129,0.2)); border:1px solid rgba(34,197,94,0.3); }
+  .mi-6 { background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(217,70,239,0.2)); border:1px solid rgba(168,85,247,0.3); }
+  .module h3 {
+    font-size:17.5px; font-weight:700; margin-bottom:8px;
+    position:relative; z-index:1;
+    display:flex; align-items:center; gap:8px;
+  }
+  .module h3 .soon {
+    font-size:9.5px; font-weight:700; padding:3px 8px; border-radius:100px;
+    background:rgba(245,158,11,0.15); color:#fcd34d;
+    letter-spacing:0.5px; text-transform:uppercase;
+  }
+  .module p { font-size:13.5px; color:var(--gray); position:relative; z-index:1; }
+  .module-arrow {
+    margin-top:16px; font-size:13px; color:#a5b4fc; font-weight:600;
+    display:flex; align-items:center; gap:6px;
+    position:relative; z-index:1;
+    transition:transform .3s;
+  }
+  .module:hover .module-arrow { transform:translateX(4px); }
+
+  /* FOOTER */
+  footer {
+    border-top:1px solid var(--border);
+    padding:40px 0 32px; position:relative; z-index:1;
+  }
+  .footer-inner {
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:20px;
+  }
+  .footer-inner p { color:var(--gray); font-size:13px; }
+  .footer-links { display:flex; gap:24px; }
+  .footer-links a {
+    color:var(--gray); text-decoration:none; font-size:13px;
+    transition:color .2s;
+  }
+  .footer-links a:hover { color:#fff; }
+
+  /* RESPONSIVE */
+  @media (max-width:900px) {
+    .dash-grid { grid-template-columns:1fr 1fr; }
+    .dash-columns { grid-template-columns:1fr; }
+    .modules-grid { grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:600px) {
+    .modules-grid { grid-template-columns:1fr; }
+    .dash-grid { grid-template-columns:1fr; }
+    .hero { padding:120px 0 40px; }
+    .hero-cta { flex-direction:column; align-items:stretch; }
+    .status-pill { display:none; }
+    .dash-tabs { display:none; }
+    .footer-inner { flex-direction:column; text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="container nav-inner">
+    <div class="logo">
+      <div class="logo-mark">🔗</div>
+      <span>Link<span style="color:var(--primary)">Link</span></span>
+    </div>
+    <div class="nav-right">
+      <div class="status-pill">
+        <span class="dot"></span>
+        Espace privé · 6 membres
+      </div>
+      <a href="#" class="btn btn-primary">Se connecter</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container">
+    <div class="badge">
+      🔒 Plateforme interne LinkLink · Accès réservé à l'équipe
+    </div>
+    <h1>
+      Votre espace de travail.<br>
+      <span class="gradient-text">Un seul endroit.</span>
+    </h1>
+    <p>
+      Fini WhatsApp et les fichiers éparpillés. Pilotez vos projets, vos dossiers,
+      vos rendez-vous et vos clients depuis un cockpit unique — conçu pour LinkLink.
+    </p>
+    <div class="hero-cta">
+      <a href="#" class="btn btn-primary btn-lg">🔓 Accéder à mon espace</a>
+      <a href="#modules" class="btn btn-ghost btn-lg">Explorer les modules</a>
+    </div>
+
+    <!-- GREETING -->
+    <div class="greeting">
+      <h2>Bonjour Alpha 👋</h2>
+      <p>Voici un aperçu de ce qui se passe dans LinkLink aujourd'hui.</p>
+    </div>
+
+    <!-- DASHBOARD PREVIEW -->
+    <div class="dashboard-wrap">
+      <div class="dashboard">
+        <div class="dash-header">
+          <h3>📊 Tableau de bord</h3>
+          <div class="dash-tabs">
+            <div class="dash-tab active">Aujourd'hui</div>
+            <div class="dash-tab">Semaine</div>
+            <div class="dash-tab">Mois</div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="kpi">
+            <div class="kpi-label">Projets actifs</div>
+            <div class="kpi-value purple">4</div>
+            <div class="kpi-sub">+1 ce mois-ci</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Tâches en cours</div>
+            <div class="kpi-value pink">12</div>
+            <div class="kpi-sub">3 en retard</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">RDV à venir</div>
+            <div class="kpi-value cyan">5</div>
+            <div class="kpi-sub">Cette semaine</div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-label">Dossiers</div>
+            <div class="kpi-value green">87</div>
+            <div class="kpi-sub">+6 cette semaine</div>
+          </div>
+        </div>
+
+        <div class="dash-columns">
+          <div class="panel">
+            <div class="panel-title">
+              ✅ Mes tâches prioritaires
+              <span>Voir tout →</span>
+            </div>
+            <div class="task-row">
+              <div class="task-check done"></div>
+              <div class="task-label done">Finaliser le pitch deck investisseurs</div>
+              <span class="task-tag tag-purple">Levée</span>
+            </div>
+            <div class="task-row">
+              <div class="task-check"></div>
+              <div class="task-label">Valider le design de la homepage</div>
+              <span class="task-tag tag-pink">Produit</span>
+            </div>
+            <div class="task-row">
+              <div class="task-check"></div>
+              <div class="task-label">Déposer les statuts au greffe</div>
+              <span class="task-tag tag-amber">Juridique</span>
+            </div>
+            <div class="task-row">
+              <div class="task-check"></div>
+              <div class="task-label">Préparer réunion client Diarra & Co</div>
+              <span class="task-tag tag-cyan">Clients</span>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">
+              👥 L'équipe
+              <span>6 fondateurs</span>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar ma1">A</div>
+              <div class="member-info">
+                <strong>Alpha D.</strong>
+                <small>En ligne · Produit</small>
+              </div>
+              <div class="member-status"></div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar ma2">M</div>
+              <div class="member-info">
+                <strong>Mariam K.</strong>
+                <small>En ligne · Design</small>
+              </div>
+              <div class="member-status"></div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar ma3">I</div>
+              <div class="member-info">
+                <strong>Ibrahima S.</strong>
+                <small>Absent · Tech</small>
+              </div>
+              <div class="member-status away"></div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar ma4">F</div>
+              <div class="member-info">
+                <strong>Fatou B.</strong>
+                <small>En ligne · Clients</small>
+              </div>
+              <div class="member-status"></div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar ma5">O</div>
+              <div class="member-info">
+                <strong>Ousmane C.</strong>
+                <small>Hors ligne · Finance</small>
+              </div>
+              <div class="member-status off"></div>
+            </div>
+            <div class="member-row">
+              <div class="member-avatar ma6">K</div>
+              <div class="member-info">
+                <strong>Kadiatou B.</strong>
+                <small>En ligne · Marketing</small>
+              </div>
+              <div class="member-status"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MODULES -->
+<section id="modules">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">Modules</div>
+      <h2 class="section-title">Tout votre travail, réuni</h2>
+      <p class="section-sub">Six modules intégrés pour remplacer tous vos outils dispersés.</p>
+    </div>
+
+    <div class="modules-grid">
+      <a href="#" class="module">
+        <div class="module-icon mi-1">📊</div>
+        <h3>Tableau de bord</h3>
+        <p>Vue d'ensemble en temps réel : projets, tâches, échéances, activité de l'équipe.</p>
+        <div class="module-arrow">Ouvrir →</div>
+      </a>
+      <a href="#" class="module">
+        <div class="module-icon mi-2">📂</div>
+        <h3>Projets & Dossiers</h3>
+        <p>Un espace par projet. Fichiers organisés, versionnés, accessibles à toute l'équipe.</p>
+        <div class="module-arrow">Ouvrir →</div>
+      </a>
+      <a href="#" class="module">
+        <div class="module-icon mi-3">✅</div>
+        <h3>Tâches & Suivi</h3>
+        <p>Kanban, listes et calendrier. Assignation, priorités, échéances et avancement.</p>
+        <div class="module-arrow">Ouvrir →</div>
+      </a>
+      <a href="#" class="module">
+        <div class="module-icon mi-4">📅</div>
+        <h3>Rendez-vous</h3>
+        <p>Planifiez vos réunions internes et clients. Créneaux, rappels, liens visio.</p>
+        <div class="module-arrow">Ouvrir →</div>
+      </a>
+      <a href="#" class="module">
+        <div class="module-icon mi-5">💬</div>
+        <h3>Messagerie</h3>
+        <p>Discussions par projet ou par client. Fils organisés, fichiers, mentions.</p>
+        <div class="module-arrow">Ouvrir →</div>
+      </a>
+      <a href="#" class="module">
+        <div class="module-icon mi-6">👥</div>
+        <h3>Clients <span class="soon">Bientôt</span></h3>
+        <p>Portail client, suivi des demandes, échanges et documents partagés.</p>
+        <div class="module-arrow">Aperçu →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container footer-inner">
+    <p>© 2026 LinkLink · Espace privé de l'équipe fondatrice</p>
+    <div class="footer-links">
+      <a href="#">Aide</a>
+      <a href="#">Journal d'activité</a>
+      <a href="#">Paramètres</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 30);
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.module, .kpi, .panel').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
