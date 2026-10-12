@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cahier des charges — LinkLink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --primary:#6366f1;
+    --primary-dark:#4f46e5;
+    --accent:#ec4899;
+    --accent2:#06b6d4;
+    --dark:#0f172a;
+    --gray:#64748b;
+    --gray-light:#94a3b8;
+    --bg:#f8fafc;
+    --border:#e2e8f0;
+    --code-bg:#1e293b;
+  }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--dark);
+    line-height:1.7;
+    font-size:15px;
+  }
+  .container { max-width:1100px; margin:0 auto; padding:0 24px; }
+
+  /* PRINT */
+  @media print {
+    body { background:#fff; font-size:11pt; }
+    .no-print { display:none !important; }
+    .cover { min-height:auto !important; padding:40px 0 !important; page-break-after:always; }
+    section { page-break-inside:avoid; }
+    h1,h2,h3 { page-break-after:avoid; }
+    .toc { page-break-after:always; }
+    a { color:inherit; text-decoration:none; }
+  }
+
+  /* COVER */
+  .cover {
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);
+    color:#fff;
+    position:relative;
+    overflow:hidden;
+    padding:40px 24px;
+  }
+  .cover::before {
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(circle at 20% 30%,rgba(99,102,241,0.3),transparent 40%),
+               radial-gradient(circle at 80% 70%,rgba(236,72,153,0.25),transparent 40%);
+  }
+  .cover-content {
+    position:relative; z-index:1;
+    text-align:center; max-width:800px;
+  }
+  .cover-logo {
+    width:80px; height:80px; margin:0 auto 32px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    border-radius:22px;
+    display:grid; place-items:center;
+    font-size:38px;
+    box-shadow:0 20px 60px rgba(99,102,241,0.5);
+  }
+  .cover h1 {
+    font-size:clamp(38px,6vw,72px);
+    font-weight:900; letter-spacing:-2px;
+    line-height:1.05; margin-bottom:20px;
+  }
+  .cover .subtitle {
+    font-size:clamp(16px,2vw,22px);
+    color:#c7d2fe; margin-bottom:48px; font-weight:400;
+  }
+  .cover-meta {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:24px; max-width:640px; margin:0 auto;
+    padding:28px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:18px;
+    backdrop-filter:blur(10px);
+  }
+  .cover-meta-item { text-align:center; }
+  .cover-meta-label {
+    font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--gray-light); margin-bottom:6px; font-weight:600;
+  }
+  .cover-meta-value { font-size:15px; font-weight:600; }
+  .cover-footer {
+    margin-top:56px; font-size:13px; color:var(--gray-light);
+  }
+  .confidential-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 20px; border-radius:100px;
+    background:rgba(236,72,153,0.15);
+    border:1px solid rgba(236,72,153,0.4);
+    color:#f9a8d4;
+    font-size:13px; font-weight:600;
+    margin-bottom:32px;
+    letter-spacing:0.5px;
+  }
+
+  /* TOC */
+  .toc {
+    padding:80px 0;
+    background:#fff;
+  }
+  .toc h2 {
+    font-size:32px; font-weight:800; letter-spacing:-1px;
+    margin-bottom:8px;
+  }
+  .toc .toc-sub {
+    color:var(--gray); margin-bottom:40px; font-size:15px;
+  }
+  .toc-list {
+    display:grid; grid-template-columns:1fr 1fr; gap:8px 40px;
+    list-style:none;
+  }
+  .toc-list li {
+    padding:12px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .toc-list a {
+    display:flex; align-items:center; gap:12px;
+    color:var(--dark); text-decoration:none;
+    font-weight:500; font-size:14.5px;
+    transition:color .2s;
+  }
+  .toc-list a:hover { color:var(--primary); }
+  .toc-num {
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:32px; height:32px; padding:0 10px;
+    background:#eef2ff; color:var(--primary);
+    border-radius:8px;
+    font-weight:700; font-size:13px;
+  }
+
+  /* SECTIONS */
+  section {
+    padding:64px 0;
+    background:#fff;
+    border-top:1px solid var(--border);
+  }
+  section:nth-child(even) { background:#fbfcfe; }
+  .section-header {
+    display:flex; align-items:flex-start; gap:20px;
+    margin-bottom:32px;
+    padding-bottom:20px;
+    border-bottom:2px solid var(--border);
+  }
+  .section-num {
+    flex-shrink:0;
+    width:56px; height:56px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff; border-radius:16px;
+    display:grid; place-items:center;
+    font-size:22px; font-weight:800;
+    box-shadow:0 8px 24px rgba(99,102,241,0.25);
+  }
+  .section-header h2 {
+    font-size:clamp(24px,3vw,34px);
+    font-weight:800; letter-spacing:-1px;
+    line-height:1.15;
+    margin-bottom:6px;
+  }
+  .section-header p {
+    color:var(--gray); font-size:14.5px;
+  }
+
+  h3 {
+    font-size:19px; font-weight:700;
+    margin-top:32px; margin-bottom:14px;
+    color:var(--dark);
+    letter-spacing:-0.3px;
+  }
+  h4 {
+    font-size:16px; font-weight:700;
+    margin-top:22px; margin-bottom:10px;
+    color:var(--primary-dark);
+  }
+  p { margin-bottom:14px; color:#334155; }
+
+  /* TABLES */
+  table {
+    width:100%;
+    border-collapse:collapse;
+    margin:20px 0;
+    font-size:14px;
+    background:#fff;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,0.05);
+  }
+  th {
+    background:#f1f5f9;
+    padding:14px 16px;
+    text-align:left;
+    font-weight:700;
+    font-size:13px;
+    color:var(--dark);
+    letter-spacing:0.3px;
+    border-bottom:2px solid var(--border);
+  }
+  td {
+    padding:12px 16px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+    color:#334155;
+  }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:#fafbff; }
+
+  /* LISTS */
+  ul, ol { padding-left:22px; margin-bottom:16px; }
+  li { margin-bottom:8px; color:#334155; }
+  li strong { color:var(--dark); }
+
+  /* CODE */
+  code {
+    font-family:'JetBrains Mono',monospace;
+    background:#eef2ff;
+    color:var(--primary-dark);
+    padding:2px 7px;
+    border-radius:5px;
+    font-size:13px;
+    font-weight:600;
+  }
+  pre {
+    background:var(--code-bg);
+    color:#e2e8f0;
+    padding:20px 24px;
+    border-radius:12px;
+    overflow-x:auto;
+    margin:16px 0;
+    font-size:13px;
+    line-height:1.6;
+    font-family:'JetBrains Mono',monospace;
+  }
+  pre code {
+    background:transparent; color:inherit;
+    padding:0; font-size:inherit;
+  }
+  .code-label {
+    display:inline-block;
+    background:#eef2ff; color:var(--primary-dark);
+    font-size:11px; font-weight:700;
+    padding:3px 10px; border-radius:6px;
+    margin-bottom:8px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+
+  /* CALLOUTS */
+  .callout {
+    padding:20px 24px;
+    border-radius:12px;
+    margin:20px 0;
+    display:flex; gap:14px;
+    align-items:flex-start;
+  }
+  .callout-icon { font-size:20px; flex-shrink:0; line-height:1; }
+  .callout-content { flex:1; }
+  .callout-content p:last-child { margin-bottom:0; }
+  .callout.info {
+    background:#eff6ff;
+    border-left:4px solid #3b82f6;
+  }
+  .callout.warning {
+    background:#fffbeb;
+    border-left:4px solid #f59e0b;
+  }
+  .callout.success {
+    background:#f0fdf4;
+    border-left:4px solid #22c55e;
+  }
+  .callout.danger {
+    background:#fef2f2;
+    border-left:4px solid #ef4444;
+  }
+  .callout strong { color:var(--dark); }
+
+  /* BADGES */
+  .badge {
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:100px;
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:0.3px;
+  }
+  .badge-phase1 { background:#dcfce7; color:#166534; }
+  .badge-phase2 { background:#fef3c7; color:#92400e; }
+  .badge-opt { background:#e0e7ff; color:#3730a3; }
+
+  /* KPI GRID */
+  .kpi-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:16px;
+    margin:20px 0;
+  }
+  .kpi-card {
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    text-align:center;
+  }
+  .kpi-card .kpi-val {
+    font-size:28px; font-weight:800;
+    color:var(--primary);
+    letter-spacing:-1px;
+    display:block; margin-bottom:4px;
+  }
+  .kpi-card .kpi-lbl {
+    font-size:12.5px;
+    color:var(--gray);
+    font-weight:500;
+  }
+
+  /* CHECKLIST */
+  .checklist { list-style:none; padding-left:0; }
+  .checklist li {
+    display:flex; align-items:flex-start; gap:12px;
+    padding:10px 0;
+    border-bottom:1px dashed var(--border);
+    font-size:14.5px;
+  }
+  .checklist li::before {
+    content:'';
+    flex-shrink:0;
+    width:18px; height:18px;
+    border:2px solid var(--primary);
+    border-radius:5px;
+    margin-top:2px;
+  }
+  .checklist li:last-child { border-bottom:none; }
+
+  /* RISK BADGES */
+  .risk-low { background:#dcfce7; color:#166534; }
+  .risk-med { background:#fef3c7; color:#92400e; }
+  .risk-high { background:#fee2e2; color:#991b1b; }
+
+  /* FOOTER */
+  footer {
+    background:var(--dark);
+    color:#94a3b8;
+    padding:56px 0 40px;
+    text-align:center;
+  }
+  footer .logo {
+    display:inline-flex; align-items:center; gap:10px;
+    font-size:20px; font-weight:800; color:#fff;
+    margin-bottom:16px;
+  }
+  footer .logo-mark {
+    width:36px; height:36px; border-radius:10px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    display:grid; place-items:center; font-size:18px;
+  }
+  footer p { color:#94a3b8; font-size:13.5px; margin-bottom:8px; }
+  footer .footer-author {
+    color:#c7d2fe; font-weight:600;
+  }
+
+  /* BACK TO TOP */
+  .back-to-top {
+    position:fixed; bottom:30px; right:30px;
+    width:48px; height:48px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    border-radius:50%;
+    display:grid; place-items:center;
+    color:#fff; font-size:20px;
+    box-shadow:0 8px 24px rgba(99,102,241,0.4);
+    text-decoration:none;
+    opacity:0; pointer-events:none;
+    transition:all .3s;
+    z-index:50;
+  }
+  .back-to-top.visible { opacity:1; pointer-events:auto; }
+  .back-to-top:hover { transform:translateY(-4px); }
+
+  /* RESPONSIVE */
+  @media (max-width:768px) {
+    .toc-list { grid-template-columns:1fr; }
+    .cover-meta { grid-template-columns:1fr; gap:16px; }
+    .section-header { flex-direction:column; gap:12px; }
+    table { font-size:13px; }
+    th, td { padding:10px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ COUVERTURE ============ -->
+<div class="cover">
+  <div class="cover-content">
+    <div class="cover-logo">🔗</div>
+    <div class="confidential-badge">🔒 Document confidentiel</div>
+    <h1>Cahier des charges<br>LinkLink</h1>
+    <p class="subtitle">Plateforme interne de pilotage de projets & gestion clients</p>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Version</div>
+        <div class="cover-meta-value">1.0</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Date</div>
+        <div class="cover-meta-value">12 Oct. 2026</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="cover-meta-label">Statut</div>
+        <div class="cover-meta-value">Référence</div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      Rédigé par <strong style="color:#fff;">Elhadj Boubacar Diallo</strong><br>
+      Fondateur & Développeur — Projet LinkLink
+    </div>
+  </div>
+</div>
+
+<!-- ============ TABLE DES MATIÈRES ============ -->
+<div class="toc">
+  <div class="container">
+    <h2>Table des matières</h2>
+    <p class="toc-sub">18 sections couvrant l'intégralité du projet, du cadrage à la maintenance.</p>
+    <ul class="toc-list">
+      <li><a href="#s1"><span class="toc-num">1</span> Contexte et présentation</a></li>
+      <li><a href="#s2"><span class="toc-num">2</span> Objectifs du projet</a></li>
+      <li><a href="#s3"><span class="toc-num">3</span> Périmètre fonctionnel</a></li>
+      <li><a href="#s4"><span class="toc-num">4</span> Acteurs et rôles</a></li>
+      <li><a href="#s5"><span class="toc-num">5</span> Besoins fonctionnels détaillés</a></li>
+      <li><a href="#s6"><span class="toc-num">6</span> Besoins non-fonctionnels</a></li>
+      <li><a href="#s7"><span class="toc-num">7</span> Architecture technique</a></li>
+      <li><a href="#s8"><span class="toc-num">8</span> Modèle de données</a></li>
+      <li><a href="#s9"><span class="toc-num">9</span> Sécurité et conformité</a></li>
+      <li><a href="#s10"><span class="toc-num">10</span> Design et expérience utilisateur</a></li>
+      <li><a href="#s11"><span class="toc-num">11</span> Planning et phasage</a></li>
+      <li><a href="#s12"><span class="toc-num">12</span> Ressources et budget</a></li>
+      <li><a href="#s13"><span class="toc-num">13</span> Livrables</a></li>
+      <li><a href="#s14"><span class="toc-num">14</span> Stratégie de tests et recette</a></li>
+      <li><a href="#s15"><span class="toc-num">15</span> Déploiement et mise en production</a></li>
+      <li><a href="#s16"><span class="toc-num">16</span> Maintenance et évolutions</a></li>
+      <li><a href="#s17"><span class="toc-num">17</span> Gestion des risques</a></li>
+      <li><a href="#s18"><span class="toc-num">18</span> Annexes</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ 1. CONTEXTE ============ -->
+<section id="s1">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div>
+        <h2>Contexte et présentation</h2>
+        <p>Comprendre pourquoi LinkLink existe et d'où l'on part.</p>
+      </div>
+    </div>
+
+    <h3>1.1 Présentation de LinkLink</h3>
+    <p><strong>LinkLink</strong> est une startup fondée par <strong>6 associés</strong> souhaitant se doter d'un outil interne centralisé pour piloter leurs projets et, à terme, gérer leurs clients depuis une plateforme unique.</p>
+
+    <h3>1.2 Situation actuelle</h3>
+    <p>Aujourd'hui, l'équipe utilise :</p>
+    <ul>
+      <li><strong>WhatsApp</strong> pour les communications et le partage de fichiers</li>
+      <li><strong>Aucun outil structuré</strong> pour les tâches, les rendez-vous et le suivi de projets</li>
+      <li>Des fichiers dispersés entre téléphones et clouds personnels</li>
+    </ul>
+
+    <h4>Problèmes identifiés</h4>
+    <table>
+      <thead>
+        <tr><th>Problème</th><th>Impact</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Fichiers compressés/expirés sur WhatsApp</td><td>Perte de documents importants</td></tr>
+        <tr><td>Absence d'arborescence</td><td>Recherche chronophage</td></tr>
+        <tr><td>Pas de suivi de tâches</td><td>Oublis, retards, doublons</td></tr>
+        <tr><td>Pas de permissions</td><td>Tout le monde voit tout</td></tr>
+        <tr><td>Pas de calendrier partagé</td><td>Difficulté à planifier</td></tr>
+        <tr><td>Historique non exploitable</td><td>Perte de connaissance</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.3 Nature du projet</h3>
+    <p>Il s'agit d'une <strong>plateforme interne privée</strong> (non SaaS, non commercialisée), destinée :</p>
+    <ol>
+      <li><strong>Phase 1</strong> — Aux 6 fondateurs uniquement</li>
+      <li><strong>Phase 2</strong> — Ouverture progressive à des clients/partenaires externes via un portail dédié</li>
+    </ol>
+
+    <div class="callout warning">
+      <div class="callout-icon">⚠️</div>
+      <div class="callout-content">
+        <p><strong>Confidentialité</strong> — Le projet est développé <strong>en secret</strong> par un seul fondateur. Aucune information ne doit fuiter avant la présentation officielle à l'équipe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. OBJECTIFS ============ -->
+<section id="s2">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div>
+        <h2>Objectifs du projet</h2>
+        <p>Ce que LinkLink doit accomplir, avec des indicateurs mesurables.</p>
+      </div>
+    </div>
+
+    <h3>2.1 Objectif général</h3>
+    <p>Créer un <strong>cockpit numérique unique</strong> qui remplace WhatsApp, les clouds dispersés et les tableurs, et qui deviendra à terme le <strong>hub officiel LinkLink</strong> pour projets et clients.</p>
+
+    <h3>2.2 Objectifs spécifiques (SMART)</h3>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Objectif</th><th>Indicateur de succès</th><th>Échéance</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>O1</td><td>Centraliser les fichiers</td><td>100% des dossiers critiques sur LinkLink</td><td>Mois 2</td></tr>
+        <tr><td>O2</td><td>Structurer les projets</td><td>6 projets actifs avec tâches et échéances</td><td>Mois 1</td></tr>
+        <tr><td>O3</td><td>Remplacer WhatsApp</td><td>Zéro échange projet sur WhatsApp</td><td>Mois 3</td></tr>
+        <tr><td>O4</td><td>Fluidifier les RDV</td><td>Tous les RDV pris via LinkLink</td><td>Mois 2</td></tr>
+        <tr><td>O5</td><td>Préparer le portail client</td><td>Structure prête à ouvrir</td><td>Mois 5</td></tr>
+        <tr><td>O6</td><td>Surprendre l'équipe</td><td>Présentation officielle réussie</td><td>Mois 3</td></tr>
+      </tbody>
+    </table>
+
+    <h3>2.3 Objectifs secondaires</h3>
+    <ul>
+      <li>Créer une <strong>identité produit</strong> forte (branding, ton, design)</li>
+      <li>Préparer une <strong>base technique scalable</strong> (support 50+ utilisateurs)</li>
+      <li>Documenter les process internes (SOP) dans la plateforme</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 3. PÉRIMÈTRE ============ -->
+<section id="s3">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div>
+        <h2>Périmètre fonctionnel</h2>
+        <p>Ce qui est inclus, ce qui est reporté, ce qui est exclu.</p>
+      </div>
+    </div>
+
+    <h3>3.1 Dans le périmètre <span class="badge badge-phase1">Phase 1 — MVP</span></h3>
+    <ul class="checklist">
+      <li>Authentification & gestion des comptes</li>
+      <li>Gestion des 6 fondateurs (rôles, permissions)</li>
+      <li>Gestion de projets (création, membres, statut)</li>
+      <li>Gestion de tâches (Kanban, liste, assignation)</li>
+      <li>Dépôt et organisation de dossiers (upload, versioning)</li>
+      <li>Messagerie interne par projet</li>
+      <li>Prise de rendez-vous interne</li>
+      <li>Tableau de bord personnel et global</li>
+      <li>Notifications (in-app + email)</li>
+      <li>Journal d'activité</li>
+    </ul>
+
+    <h3>3.2 Dans le périmètre <span class="badge badge-phase2">Phase 2 — Portail client</span></h3>
+    <ul class="checklist">
+      <li>Espace client sécurisé</li>
+      <li>Partage de dossiers avec clients</li>
+      <li>Messagerie fondateur ↔ client</li>
+      <li>Prise de RDV client</li>
+      <li>Suivi de tâches visible par le client (optionnel)</li>
+      <li>Facturation / devis (optionnel)</li>
+    </ul>
+
+    <h3>3.3 Hors périmètre</h3>
+    <ul>
+      <li>❌ Application mobile native (iOS/Android)</li>
+      <li>❌ Marketplace / multi-tenant SaaS</li>
+      <li>❌ IA générative intégrée (reporté V3)</li>
+      <li>❌ Visioconférence native (lien externe suffit)</li>
+      <li>❌ Comptabilité / paie</li>
+      <li>❌ CRM commercial complet (vente, pipeline avancé)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 4. ACTEURS ============ -->
+<section id="s4">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div>
+        <h2>Acteurs et rôles</h2>
+        <p>Qui utilise la plateforme et avec quelles permissions.</p>
+      </div>
+    </div>
+
+    <h3>4.1 Types d'utilisateurs</h3>
+    <table>
+      <thead>
+        <tr><th>Acteur</th><th>Description</th><th>Phase</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Super Admin</strong></td><td>Fondateur développeur (Elhadj Boubacar Diallo). Contrôle total.</td><td>1</td></tr>
+        <tr><td><strong>Fondateur</strong></td><td>Membre de l'équipe. Accès projets assignés.</td><td>1</td></tr>
+        <tr><td><strong>Invité interne</strong></td><td>Prestataire temporaire. Accès limité.</td><td>1</td></tr>
+        <tr><td><strong>Client</strong></td><td>Client externe. Accès à son espace.</td><td>2</td></tr>
+        <tr><td><strong>Partenaire</strong></td><td>Collaborateur externe. Accès projet spécifique.</td><td>2</td></tr>
+      </tbody>
+    </table>
+
+    <h3>4.2 Matrice des permissions (Phase 1)</h3>
+    <table>
+      <thead>
+        <tr><th>Action</th><th>Super Admin</th><th>Fondateur</th><th>Invité</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Créer un projet</td><td>✅</td><td>✅</td><td>❌</td></tr>
+        <tr><td>Supprimer un projet</td><td>✅</td><td>❌</td><td>❌</td></tr>
+        <tr><td>Inviter un membre</td><td>✅</td><td>✅</td><td>❌</td></tr>
+        <tr><td>Créer une tâche</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Supprimer une tâche</td><td>✅</td><td>✅</td><td>❌</td></tr>
+        <tr><td>Uploader un fichier</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Supprimer un fichier</td><td>✅</td><td>✅</td><td>❌</td></tr>
+        <tr><td>Envoyer un message</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Créer un RDV</td><td>✅</td><td>✅</td><td>❌</td></tr>
+        <tr><td>Voir le journal d'activité</td><td>✅</td><td>❌</td><td>❌</td></tr>
+        <tr><td>Gérer les rôles</td><td>✅</td><td>❌</td><td>❌</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 5. BESOINS FONCTIONNELS ============ -->
+<section id="s5">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div>
+        <h2>Besoins fonctionnels détaillés</h2>
+        <p>Chaque module, chaque fonctionnalité, sans rien oublier.</p>
+      </div>
+    </div>
+
+    <h3>5.1 Module — Authentification & Comptes</h3>
+    <h4>F-AUTH-01 — Inscription</h4>
+    <ul>
+      <li>Inscription sur invitation uniquement (pas d'auto-inscription)</li>
+      <li>Champs : nom, prénom, email, mot de passe (min. 12 caractères)</li>
+      <li>Validation par email obligatoire</li>
+    </ul>
+    <h4>F-AUTH-02 — Connexion</h4>
+    <ul>
+      <li>Email + mot de passe</li>
+      <li>Option "Se souvenir de moi" (30 jours)</li>
+      <li>Verrouillage après 5 échecs (15 min)</li>
+    </ul>
+    <h4>F-AUTH-03 — Récupération de mot de passe</h4>
+    <ul>
+      <li>Lien par email, valable 1h</li>
+      <li>Force un mot de passe fort à la réinitialisation</li>
+    </ul>
+    <h4>F-AUTH-04 — Double authentification (2FA)</h4>
+    <ul>
+      <li>Optionnel en Phase 1, obligatoire pour Super Admin</li>
+      <li>Via application TOTP (Google Authenticator)</li>
+    </ul>
+    <h4>F-AUTH-05 — Profil utilisateur</h4>
+    <ul>
+      <li>Avatar, nom, rôle, statut, bio courte</li>
+      <li>Statut de présence : En ligne / Absent / Hors ligne</li>
+    </ul>
+
+    <h3>5.2 Module — Projets</h3>
+    <h4>F-PROJ-01 — Création de projet</h4>
+    <ul>
+      <li>Champs obligatoires : nom, description, couleur, statut</li>
+      <li>Champs optionnels : date début, date fin, budget</li>
+      <li>Le créateur devient automatiquement membre</li>
+    </ul>
+    <h4>F-PROJ-02 — Liste des projets</h4>
+    <ul>
+      <li>Vue grille ou liste</li>
+      <li>Filtres : statut (actif/pause/terminé), membre, date</li>
+      <li>Recherche par nom</li>
+    </ul>
+    <h4>F-PROJ-03 — Détail projet</h4>
+    <ul>
+      <li>Onglets : Vue d'ensemble, Tâches, Dossiers, Messages, RDV, Membres, Activité</li>
+      <li>Progression automatique (% tâches terminées)</li>
+      <li>Actions rapides : ajouter tâche, ajouter fichier, inviter</li>
+    </ul>
+    <h4>F-PROJ-04 — Membres du projet</h4>
+    <ul>
+      <li>Ajout/retrait de fondateurs</li>
+      <li>Rôle dans le projet : Responsable / Contributeur / Observateur</li>
+    </ul>
+    <h4>F-PROJ-05 — Archivage</h4>
+    <ul>
+      <li>Un projet terminé peut être archivé (non supprimé)</li>
+      <li>Reste consultable, non modifiable</li>
+    </ul>
+
+    <h3>5.3 Module — Tâches</h3>
+    <h4>F-TASK-01 — Création de tâche</h4>
+    <ul>
+      <li>Champs : titre, description, assigné à, échéance, priorité, statut, tags</li>
+      <li>Pièces jointes possibles</li>
+      <li>Sous-tâches (checklist)</li>
+    </ul>
+    <h4>F-TASK-02 — Vues multiples</h4>
+    <ul>
+      <li><strong>Kanban</strong> : À faire / En cours / En révision / Terminé</li>
+      <li><strong>Liste</strong> : tri par échéance, priorité, assigné</li>
+      <li><strong>Calendrier</strong> : échéances sur un mois</li>
+      <li><strong>Ma journée</strong> : tâches assignées à moi pour aujourd'hui</li>
+    </ul>
+    <h4>F-TASK-03 — Priorités</h4>
+    <p>🔴 Urgent / 🟠 Élevée / 🟡 Moyenne / 🟢 Basse</p>
+    <h4>F-TASK-04 — Commentaires</h4>
+    <ul>
+      <li>Fil de discussion par tâche</li>
+      <li>Mentions @utilisateur (notifie)</li>
+    </ul>
+    <h4>F-TASK-05 — Récurrence</h4>
+    <ul>
+      <li>Option : quotidienne, hebdomadaire, mensuelle</li>
+    </ul>
+    <h4>F-TASK-06 — Notifications</h4>
+    <ul>
+      <li>Assignation → notification instantanée</li>
+      <li>Échéance J-1 et J-0 → rappel</li>
+      <li>Tâche en retard → alerte</li>
+    </ul>
+
+    <h3>5.4 Module — Dossiers & Fichiers</h3>
+    <h4>F-FILE-01 — Upload</h4>
+    <ul>
+      <li>Glisser-déposer + sélection classique</li>
+      <li>Taille max par fichier : 100 MB</li>
+      <li>Formats supportés : PDF, DOCX, XLSX, PPTX, images, ZIP, vidéos légères</li>
+    </ul>
+    <h4>F-FILE-02 — Arborescence</h4>
+    <ul>
+      <li>Dossiers et sous-dossiers illimités</li>
+      <li>Un dossier racine par projet</li>
+    </ul>
+    <h4>F-FILE-03 — Versioning</h4>
+    <ul>
+      <li>Conservation des versions précédentes</li>
+      <li>Comparaison visuelle des versions (date, auteur, taille)</li>
+    </ul>
+    <h4>F-FILE-04 — Permissions</h4>
+    <ul>
+      <li>Par dossier : qui peut voir / modifier</li>
+      <li>Par défaut : tous les membres du projet</li>
+    </ul>
+    <h4>F-FILE-05 — Recherche</h4>
+    <ul>
+      <li>Recherche par nom, type, auteur, date, projet</li>
+    </ul>
+    <h4>F-FILE-06 — Aperçu en ligne</h4>
+    <ul>
+      <li>PDF, images, Office (via visionneuse intégrée)</li>
+    </ul>
+    <h4>F-FILE-07 — Partage externe <span class="badge badge-phase2">Phase 2</span></h4>
+    <ul>
+      <li>Lien sécurisé avec expiration</li>
+      <li>Accès protégé par mot de passe (optionnel)</li>
+    </ul>
+
+    <h3>5.5 Module — Messagerie</h3>
+    <h4>F-MSG-01 — Fils de discussion</h4>
+    <ul>
+      <li>Un fil par projet</li>
+      <li>Fils directs entre deux membres</li>
+      <li>Fils thématiques (créés manuellement)</li>
+    </ul>
+    <h4>F-MSG-02 — Messages</h4>
+    <ul>
+      <li>Texte enrichi (gras, italique, listes, liens)</li>
+      <li>Pièces jointes (renvoi vers module Dossiers)</li>
+      <li>Réactions emoji</li>
+    </ul>
+    <h4>F-MSG-03 — Mentions</h4>
+    <ul>
+      <li>@utilisateur → notification</li>
+      <li>@tous → notification à tous les membres du projet</li>
+    </ul>
+    <h4>F-MSG-04 — Accusés de lecture</h4>
+    <ul>
+      <li>Indicateur lu/non lu par message</li>
+      <li>Compteur de non-lus par fil</li>
+    </ul>
+    <h4>F-MSG-05 — Recherche</h4>
+    <ul>
+      <li>Recherche plein texte dans tous les messages</li>
+    </ul>
+    <h4>F-MSG-06 — Épinglage</h4>
+    <ul>
+      <li>Épingler un message important en haut du fil</li>
+    </ul>
+
+    <h3>5.6 Module — Rendez-vous</h3>
+    <h4>F-RDV-01 — Création de RDV</h4>
+    <ul>
+      <li>Titre, description, date/heure début et fin, lieu (physique ou visio)</li>
+      <li>Invités (membres + optionnellement clients en Phase 2)</li>
+      <li>Récurrence possible</li>
+    </ul>
+    <h4>F-RDV-02 — Créneaux de disponibilité</h4>
+    <ul>
+      <li>Chaque membre peut définir ses créneaux</li>
+      <li>Vue "trouver un créneau commun"</li>
+    </ul>
+    <h4>F-RDV-03 — Rappels</h4>
+    <ul>
+      <li>24h avant, 1h avant, 10 min avant (configurable)</li>
+      <li>Canaux : email + notification in-app</li>
+    </ul>
+    <h4>F-RDV-04 — Lien visio</h4>
+    <ul>
+      <li>Génération automatique d'un lien Jitsi ou Google Meet</li>
+      <li>Intégration dans la description du RDV</li>
+    </ul>
+    <h4>F-RDV-05 — Calendrier</h4>
+    <ul>
+      <li>Vue mois / semaine / jour</li>
+      <li>Vue par membre ou globale</li>
+    </ul>
+    <h4>F-RDV-06 — Réponses</h4>
+    <ul>
+      <li>Accepter / Refuser / Peut-être</li>
+      <li>Statut visible par tous les invités</li>
+    </ul>
+
+    <h3>5.7 Module — Tableau de bord</h3>
+    <h4>F-DASH-01 — Vue personnelle</h4>
+    <ul>
+      <li>Mes tâches du jour</li>
+      <li>Mes RDV à venir</li>
+      <li>Mes projets actifs</li>
+      <li>Derniers messages non lus</li>
+    </ul>
+    <h4>F-DASH-02 — Vue globale (Super Admin)</h4>
+    <ul>
+      <li>Toutes les tâches en retard</li>
+      <li>Charge par membre</li>
+      <li>Progression de chaque projet</li>
+      <li>Activité récente</li>
+    </ul>
+    <h4>F-DASH-03 — KPIs</h4>
+    <ul>
+      <li>Nombre de projets actifs</li>
+      <li>Tâches terminées cette semaine</li>
+      <li>RDV de la semaine</li>
+      <li>Nouveaux fichiers</li>
+    </ul>
+    <h4>F-DASH-04 — Graphiques</h4>
+    <ul>
+      <li>Progression par projet (courbe)</li>
+      <li>Répartition des tâches par statut (donut)</li>
+      <li>Charge par membre (barres)</li>
+    </ul>
+
+    <h3>5.8 Module — Notifications</h3>
+    <h4>F-NOTIF-01 — In-app</h4>
+    <ul>
+      <li>Cloche avec compteur</li>
+      <li>Liste déroulante des 20 dernières</li>
+    </ul>
+    <h4>F-NOTIF-02 — Email</h4>
+    <ul>
+      <li>Résumé instantané pour mentions/assignations</li>
+      <li>Digest quotidien (8h) et hebdomadaire (lundi 8h)</li>
+    </ul>
+    <h4>F-NOTIF-03 — Préférences</h4>
+    <ul>
+      <li>Par utilisateur : activer/désactiver par type</li>
+      <li>Choisir canal : in-app / email / les deux</li>
+    </ul>
+
+    <h3>5.9 Module — Journal d'activité</h3>
+    <h4>F-LOG-01 — Traçabilité</h4>
+    <ul>
+      <li>Enregistrer chaque action : qui, quoi, quand, où</li>
+    </ul>
+    <h4>F-LOG-02 — Consultation</h4>
+    <ul>
+      <li>Filtrer par utilisateur, projet, type, date</li>
+      <li>Export CSV</li>
+    </ul>
+
+    <h3>5.10 Module — Administration</h3>
+    <h4>F-ADMIN-01 — Gestion utilisateurs</h4>
+    <ul>
+      <li>Créer / désactiver / supprimer un compte</li>
+      <li>Renvoyer une invitation</li>
+      <li>Forcer 2FA</li>
+    </ul>
+    <h4>F-ADMIN-02 — Paramètres généraux</h4>
+    <ul>
+      <li>Nom de la structure, logo, couleurs</li>
+      <li>Fuseau horaire, langue</li>
+    </ul>
+    <h4>F-ADMIN-03 — Modèles</h4>
+    <ul>
+      <li>Modèles de messages, de tâches, de projets</li>
+    </ul>
+
+    <h3>5.11 Module — Clients <span class="badge badge-phase2">Phase 2</span></h3>
+    <h4>F-CLIENT-01 — Fiches clients</h4>
+    <ul>
+      <li>Nom, contact, entreprise, historique</li>
+      <li>Projets liés</li>
+      <li>Documents partagés</li>
+    </ul>
+    <h4>F-CLIENT-02 — Portail client</h4>
+    <ul>
+      <li>Accès sécurisé avec compte dédié</li>
+      <li>Le client voit : son projet, ses RDV, ses documents partagés, sa messagerie</li>
+    </ul>
+    <h4>F-CLIENT-03 — Messagerie client</h4>
+    <ul>
+      <li>Fil unique par client</li>
+      <li>Notifications</li>
+    </ul>
+    <h4>F-CLIENT-04 — Facturation <span class="badge badge-opt">Optionnel</span></h4>
+    <ul>
+      <li>Génération de devis / factures PDF</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 6. NON-FONCTIONNEL ============ -->
+<section id="s6">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div>
+        <h2>Besoins non-fonctionnels</h2>
+        <p>Performance, sécurité, disponibilité, compatibilité.</p>
+      </div>
+    </div>
+
+    <h3>6.1 Performance</h3>
+    <table>
+      <thead><tr><th>Critère</th><th>Cible</th></tr></thead>
+      <tbody>
+        <tr><td>Temps de chargement initial</td><td>&lt; 2 s</td></tr>
+        <tr><td>Temps de réponse API</td><td>&lt; 300 ms (p95)</td></tr>
+        <tr><td>Upload 100 MB</td><td>&lt; 30 s</td></tr>
+        <tr><td>Utilisateurs simultanés</td><td>50+</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.2 Disponibilité</h3>
+    <ul>
+      <li><strong>Uptime cible</strong> : 99,5% (hors maintenance planifiée)</li>
+      <li><strong>Maintenance</strong> : fenêtre nocturne, préavis 48h</li>
+    </ul>
+
+    <h3>6.3 Scalabilité</h3>
+    <ul>
+      <li>Architecture prête pour 50 utilisateurs et 100 projets</li>
+      <li>Migration future vers multi-tenant possible</li>
+    </ul>
+
+    <h3>6.4 Compatibilité</h3>
+    <ul>
+      <li><strong>Navigateurs</strong> : Chrome, Firefox, Safari, Edge (2 dernières versions)</li>
+      <li><strong>OS</strong> : Windows, macOS, Linux, iOS, Android (via navigateur)</li>
+      <li><strong>Responsive</strong> : mobile-first pour les écrans ≥ 375 px</li>
+    </ul>
+
+    <h3>6.5 Ergonomie</h3>
+    <ul>
+      <li>Interface en français</li>
+      <li>Accessibilité WCAG AA</li>
+      <li>Navigation clavier complète</li>
+      <li>Feedback visuel sur chaque action</li>
+    </ul>
+
+    <h3>6.6 Sécurité</h3>
+    <ul>
+      <li>HTTPS obligatoire</li>
+      <li>Chiffrement en transit (TLS 1.3) et au repos (AES-256)</li>
+      <li>Mots de passe hashés (bcrypt ou Argon2)</li>
+      <li>Protection CSRF, XSS, injection SQL</li>
+      <li>Rate limiting sur endpoints sensibles</li>
+      <li>Logs d'accès conservés 12 mois</li>
+    </ul>
+
+    <h3>6.7 Sauvegarde</h3>
+    <ul>
+      <li><strong>Base de données</strong> : sauvegarde quotidienne, rétention 30 jours</li>
+      <li><strong>Fichiers</strong> : réplication géographique</li>
+      <li><strong>RPO</strong> : 24h — <strong>RTO</strong> : 4h</li>
+      <li>Test de restauration mensuel</li>
+    </ul>
+
+    <h3>6.8 Conformité</h3>
+    <ul>
+      <li><strong>RGPD</strong> : registre des traitements, droit d'accès, droit à l'oubli</li>
+      <li><strong>Hébergement</strong> : UE (France de préférence)</li>
+      <li><strong>CGU + Politique de confidentialité</strong> rédigées</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 7. ARCHITECTURE ============ -->
+<section id="s7">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div>
+        <h2>Architecture technique</h2>
+        <p>Stack, schéma logique, environnements, structure du code.</p>
+      </div>
+    </div>
+
+    <h3>7.1 Stack recommandée</h3>
+    <table>
+      <thead><tr><th>Couche</th><th>Technologie</th><th>Justification</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend</td><td>Next.js 15 + React 19</td><td>SSR, performance, SEO (site public futur)</td></tr>
+        <tr><td>UI</td><td>Tailwind CSS + shadcn/ui</td><td>Rapidité, cohérence, personnalisable</td></tr>
+        <tr><td>État global</td><td>Zustand ou React Query</td><td>Léger, simple</td></tr>
+        <tr><td>Backend</td><td>Next.js API Routes</td><td>Un seul repo au début</td></tr>
+        <tr><td>Base de données</td><td>PostgreSQL (via Supabase)</td><td>Robuste, RLS intégré</td></tr>
+        <tr><td>ORM</td><td>Prisma</td><td>Type-safe, migrations</td></tr>
+        <tr><td>Auth</td><td>Supabase Auth (ou NextAuth)</td><td>Intégré, 2FA, OAuth</td></tr>
+        <tr><td>Stockage fichiers</td><td>Supabase Storage (ou S3/R2)</td><td>Simple, sécurisé</td></tr>
+        <tr><td>Temps réel</td><td>Supabase Realtime</td><td>Messagerie, notifications</td></tr>
+        <tr><td>Emails</td><td>Resend (ou Postmark)</td><td>API moderne, fiable</td></tr>
+        <tr><td>Visio</td><td>Jitsi Meet (self-host)</td><td>Gratuit, open-source</td></tr>
+        <tr><td>Hébergement</td><td>Vercel + Supabase</td><td>Simple, scalable</td></tr>
+        <tr><td>Monitoring</td><td>Sentry + Vercel Analytics</td><td>Erreurs + perf</td></tr>
+        <tr><td>CI/CD</td><td>GitHub Actions</td><td>Automatisation</td></tr>
+      </tbody>
+    </table>
+
+    <h3>7.2 Architecture logique</h3>
+    <pre><code>┌─────────────────────────────────────────────────┐
+│              UTILISATEURS                       │
+│   Fondateurs · Invités · (Clients Phase 2)      │
+└──────────────────┬──────────────────────────────┘
+                   │ HTTPS
+        ┌──────────▼──────────┐
+        │   Next.js (Vercel)  │
+        │  Frontend + API     │
+        └──────────┬──────────┘
+                   │
+     ┌─────────────┼─────────────┐
+     │             │             │
+┌────▼─────┐ ┌────▼─────┐ ┌────▼─────┐
+│PostgreSQL│ │ Storage  │ │ Realtime │
+│(Supabase)│ │(Supabase)│ │(Supabase)│
+└──────────┘ └──────────┘ └──────────┘
+     │             │             │
+     └─────────────┼─────────────┘
+                   │
+             ┌─────▼─────┐
+             │  Resend   │
+             │  (Emails) │
+             └───────────┘</code></pre>
+
+    <h3>7.3 Environnements</h3>
+    <table>
+      <thead><tr><th>Env</th><th>Usage</th><th>URL</th></tr></thead>
+      <tbody>
+        <tr><td>Dev</td><td>Développement local</td><td>localhost:3000</td></tr>
+        <tr><td>Staging</td><td>Tests avant prod</td><td>staging.linklink.app</td></tr>
+        <tr><td>Prod</td><td>Production</td><td>app.linklink.app</td></tr>
+      </tbody>
+    </table>
+
+    <h3>7.4 Structure du projet</h3>
+    <pre><code>linklink/
+├── app/
+│   ├── (auth)/
+│   │   ├── login/
+│   │   └── register/
+│   ├── (app)/
+│   │   ├── dashboard/
+│   │   ├── projects/
+│   │   ├── tasks/
+│   │   ├── files/
+│   │   ├── messages/
+│   │   ├── calendar/
+│   │   └── settings/
+│   ├── (client)/        # Phase 2
+│   └── api/
+├── components/
+│   ├── ui/              # shadcn
+│   ├── layout/
+│   └── features/
+├── lib/
+│   ├── supabase/
+│   ├── utils/
+│   └── validators/
+├── prisma/
+│   └── schema.prisma
+├── public/
+├── types/
+└── tests/</code></pre>
+  </div>
+</section>
+
+<!-- ============ 8. MODÈLE DE DONNÉES ============ -->
+<section id="s8">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div>
+        <h2>Modèle de données</h2>
+        <p>Structure de la base, entités, relations, index.</p>
+      </div>
+    </div>
+
+    <h3>8.1 Entités principales</h3>
+    <span class="code-label">SQL — Schéma</span>
+    <pre><code>users
+  id (uuid, PK)
+  email (unique)
+  password_hash
+  first_name
+  last_name
+  avatar_url
+  role (super_admin | founder | guest)
+  status (online | away | offline)
+  two_factor_enabled
+  created_at
+  last_login_at
+
+projects
+  id (uuid, PK)
+  name
+  description
+  color
+  status (active | paused | completed | archived)
+  start_date
+  end_date
+  created_by (FK users)
+  created_at
+  updated_at
+
+project_members
+  id (uuid, PK)
+  project_id (FK)
+  user_id (FK)
+  role (owner | contributor | viewer)
+  joined_at
+
+tasks
+  id (uuid, PK)
+  project_id (FK)
+  title
+  description
+  status (todo | doing | review | done)
+  priority (urgent | high | medium | low)
+  assigned_to (FK users, nullable)
+  due_date
+  created_by (FK users)
+  parent_task_id (FK tasks, nullable)
+  recurrence
+  created_at
+  completed_at
+
+task_comments
+  id (uuid, PK)
+  task_id (FK)
+  user_id (FK)
+  content
+  created_at
+
+folders
+  id (uuid, PK)
+  project_id (FK)
+  parent_folder_id (FK folders, nullable)
+  name
+  created_by (FK users)
+  created_at
+
+files
+  id (uuid, PK)
+  folder_id (FK)
+  project_id (FK)
+  name
+  size
+  mime_type
+  storage_path
+  version (int)
+  parent_file_id (FK files, nullable)
+  uploaded_by (FK users)
+  created_at
+
+messages
+  id (uuid, PK)
+  project_id (FK, nullable)
+  thread_id (FK threads)
+  user_id (FK)
+  content
+  created_at
+  edited_at
+
+threads
+  id (uuid, PK)
+  project_id (FK, nullable)
+  type (project | direct | custom)
+  name
+  created_at
+
+message_reads
+  message_id (FK)
+  user_id (FK)
+  read_at
+
+events
+  id (uuid, PK)
+  project_id (FK, nullable)
+  title
+  description
+  start_at
+  end_at
+  location
+  visio_url
+  recurrence
+  created_by (FK users)
+  created_at
+
+event_attendees
+  event_id (FK)
+  user_id (FK)
+  status (accepted | declined | maybe | pending)
+
+notifications
+  id (uuid, PK)
+  user_id (FK)
+  type
+  title
+  body
+  link
+  read
+  created_at
+
+activity_logs
+  id (uuid, PK)
+  user_id (FK)
+  action
+  entity_type
+  entity_id
+  metadata (jsonb)
+  created_at
+
+# Phase 2
+clients
+  id (uuid, PK)
+  name
+  company
+  email
+  phone
+  portal_user_id (FK users)
+  created_by (FK users)
+  created_at</code></pre>
+
+    <h3>8.2 Relations clés</h3>
+    <ul>
+      <li>Un <strong>user</strong> peut être membre de plusieurs <strong>projects</strong></li>
+      <li>Un <strong>project</strong> contient <strong>tasks</strong>, <strong>folders</strong>, <strong>messages</strong>, <strong>events</strong></li>
+      <li>Une <strong>task</strong> peut avoir des sous-tâches et des commentaires</li>
+      <li>Un <strong>file</strong> peut avoir plusieurs <strong>versions</strong></li>
+    </ul>
+
+    <h3>8.3 Index à prévoir</h3>
+    <ul>
+      <li><code>users.email</code></li>
+      <li><code>projects.status</code></li>
+      <li><code>tasks.assigned_to</code>, <code>tasks.due_date</code>, <code>tasks.status</code></li>
+      <li><code>messages.thread_id</code>, <code>messages.created_at</code></li>
+      <li><code>notifications.user_id</code>, <code>notifications.read</code></li>
+      <li><code>activity_logs.created_at</code></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 9. SÉCURITÉ ============ -->
+<section id="s9">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <div>
+        <h2>Sécurité et conformité</h2>
+        <p>Protection des données, RGPD, journalisation.</p>
+      </div>
+    </div>
+
+    <h3>9.1 Authentification</h3>
+    <ul>
+      <li>Mots de passe : min. 12 caractères, 1 maj, 1 min, 1 chiffre, 1 spécial</li>
+      <li>Hashing : Argon2id</li>
+      <li>2FA obligatoire pour Super Admin</li>
+      <li>Sessions : expiration 30 jours max</li>
+    </ul>
+
+    <h3>9.2 Autorisation</h3>
+    <ul>
+      <li><strong>Row Level Security (RLS)</strong> activé sur toutes les tables sensibles</li>
+      <li>Politique : un utilisateur ne voit que les données des projets dont il est membre</li>
+      <li>Vérification côté serveur systématique</li>
+    </ul>
+
+    <h3>9.3 Protection des données</h3>
+    <ul>
+      <li>Chiffrement en transit : TLS 1.3</li>
+      <li>Chiffrement au repos : AES-256</li>
+      <li>Fichiers sensibles : URLs signées à durée limitée</li>
+    </ul>
+
+    <h3>9.4 RGPD</h3>
+    <ul>
+      <li>Registre des traitements tenu à jour</li>
+      <li>Consentement explicite à l'inscription</li>
+      <li>Droit d'accès : export des données en 1 clic</li>
+      <li>Droit à l'oubli : suppression en cascade</li>
+      <li>DPO : le Super Admin</li>
+    </ul>
+
+    <h3>9.5 Journalisation</h3>
+    <ul>
+      <li>Toutes les actions sensibles sont loguées</li>
+      <li>Conservation 12 mois</li>
+      <li>Accès aux logs : Super Admin uniquement</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 10. DESIGN ============ -->
+<section id="s10">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <div>
+        <h2>Design et expérience utilisateur</h2>
+        <p>Charte graphique, principes UX, pages, composants.</p>
+      </div>
+    </div>
+
+    <h3>10.1 Charte graphique</h3>
+    <table>
+      <thead><tr><th>Élément</th><th>Valeur</th></tr></thead>
+      <tbody>
+        <tr><td>Couleur primaire</td><td><code>#6366F1</code> (Indigo)</td></tr>
+        <tr><td>Couleur secondaire</td><td><code>#EC4899</code> (Rose)</td></tr>
+        <tr><td>Accent</td><td><code>#06B6D4</code> (Cyan)</td></tr>
+        <tr><td>Fond sombre</td><td><code>#05050F</code></td></tr>
+        <tr><td>Fond clair</td><td><code>#F8FAFC</code></td></tr>
+        <tr><td>Texte principal</td><td><code>#FFFFFF</code> / <code>#0A0A1A</code></td></tr>
+        <tr><td>Police</td><td>Inter (Google Fonts)</td></tr>
+        <tr><td>Rayon</td><td>12px (boutons), 20px (cartes)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>10.2 Principes UX</h3>
+    <ol>
+      <li><strong>Simplicité</strong> — 3 clics maximum pour toute action courante</li>
+      <li><strong>Cohérence</strong> — Mêmes patterns partout</li>
+      <li><strong>Feedback</strong> — Chaque action donne un retour visuel</li>
+      <li><strong>Rapidité</strong> — Raccourcis clavier, recherche globale (Cmd+K)</li>
+      <li><strong>Accessibilité</strong> — Contraste AA, navigation clavier</li>
+    </ol>
+
+    <h3>10.3 Pages principales</h3>
+    <ul>
+      <li><code>/login</code> — Connexion</li>
+      <li><code>/register</code> — Inscription (par invitation)</li>
+      <li><code>/dashboard</code> — Tableau de bord</li>
+      <li><code>/projects</code> — Liste des projets</li>
+      <li><code>/projects/[id]</code> — Détail projet (onglets)</li>
+      <li><code>/tasks</code> — Vue globale des tâches</li>
+      <li><code>/files</code> — Explorateur de fichiers</li>
+      <li><code>/messages</code> — Messagerie</li>
+      <li><code>/calendar</code> — Calendrier</li>
+      <li><code>/team</code> — Équipe</li>
+      <li><code>/settings</code> — Paramètres personnels</li>
+      <li><code>/admin</code> — Administration (Super Admin)</li>
+      <li><code>/clients</code> — Phase 2</li>
+    </ul>
+
+    <h3>10.4 Composants récurrents</h3>
+    <ul>
+      <li>Sidebar de navigation</li>
+      <li>Topbar avec recherche + notifications + profil</li>
+      <li>Cartes de projet</li>
+      <li>Cartes de tâche</li>
+      <li>Modales de création/édition</li>
+      <li>Toasts de confirmation</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 11. PLANNING ============ -->
+<section id="s11">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <div>
+        <h2>Planning et phasage</h2>
+        <p>Sprints, durées, jalons clés.</p>
+      </div>
+    </div>
+
+    <h3>11.1 Vue d'ensemble</h3>
+    <table>
+      <thead><tr><th>Phase</th><th>Durée</th><th>Livrable</th></tr></thead>
+      <tbody>
+        <tr><td>P0 — Cadrage</td><td>1 semaine</td><td>Cahier des charges validé, maquettes</td></tr>
+        <tr><td>P1 — Fondations</td><td>2 semaines</td><td>Auth, users, projet de base</td></tr>
+        <tr><td>P2 — Cœur métier</td><td>3 semaines</td><td>Projets, tâches, dossiers</td></tr>
+        <tr><td>P3 — Communication</td><td>2 semaines</td><td>Messagerie, notifications</td></tr>
+        <tr><td>P4 — Planification</td><td>1,5 semaine</td><td>RDV, calendrier</td></tr>
+        <tr><td>P5 — Dashboards</td><td>1,5 semaine</td><td>Tableau de bord, KPIs</td></tr>
+        <tr><td>P6 — Finitions</td><td>1 semaine</td><td>Tests, sécurité, déploiement</td></tr>
+        <tr><td>P7 — Présentation</td><td>3 jours</td><td>Découverte par l'équipe</td></tr>
+        <tr><td>P8 — Portail client</td><td>4 semaines</td><td>Espace client (Phase 2)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <div class="callout-icon">ℹ️</div>
+      <div class="callout-content">
+        <p><strong>Total MVP : ~12 semaines</strong> — En solo à temps partiel : 4–5 mois.</p>
+      </div>
+    </div>
+
+    <h3>11.2 Détail des sprints</h3>
+    <h4>Sprint 0 — Cadrage (S1)</h4>
+    <ul>
+      <li>Validation CDC</li>
+      <li>Maquettes Figma</li>
+      <li>Setup projet (repo, Supabase, Vercel)</li>
+      <li>Charte graphique</li>
+    </ul>
+    <h4>Sprint 1 — Auth & Utilisateurs (S2–S3)</h4>
+    <ul>
+      <li>Inscription, connexion, 2FA</li>
+      <li>Gestion des rôles</li>
+      <li>Profils utilisateurs</li>
+      <li>Middleware d'authentification</li>
+    </ul>
+    <h4>Sprint 2 — Projets (S4–S5)</h4>
+    <ul>
+      <li>CRUD projets</li>
+      <li>Membres et permissions</li>
+      <li>Vue liste et détail</li>
+      <li>Archivage</li>
+    </ul>
+    <h4>Sprint 3 — Tâches (S5–S6)</h4>
+    <ul>
+      <li>CRUD tâches</li>
+      <li>Kanban, liste, calendrier</li>
+      <li>Sous-tâches, commentaires</li>
+      <li>Priorités, échéances</li>
+    </ul>
+    <h4>Sprint 4 — Dossiers (S6–S7)</h4>
+    <ul>
+      <li>Upload de fichiers</li>
+      <li>Arborescence</li>
+      <li>Versioning</li>
+      <li>Permissions</li>
+    </ul>
+    <h4>Sprint 5 — Messagerie (S8–S9)</h4>
+    <ul>
+      <li>Fils de discussion</li>
+      <li>Temps réel</li>
+      <li>Mentions, réactions</li>
+      <li>Recherche</li>
+    </ul>
+    <h4>Sprint 6 — RDV (S9–S10)</h4>
+    <ul>
+      <li>CRUD événements</li>
+      <li>Calendrier</li>
+      <li>Rappels</li>
+      <li>Visio</li>
+    </ul>
+    <h4>Sprint 7 — Dashboard & Notifs (S10–S11)</h4>
+    <ul>
+      <li>Tableau de bord</li>
+      <li>KPIs</li>
+      <li>Notifications in-app + email</li>
+      <li>Journal d'activité</li>
+    </ul>
+    <h4>Sprint 8 — Finitions (S11–S12)</h4>
+    <ul>
+      <li>Tests E2E</li>
+      <li>Sécurité (audit)</li>
+      <li>Performance</li>
+      <li>Documentation</li>
+      <li>Déploiement prod</li>
+    </ul>
+    <h4>Sprint 9 — Présentation (S12)</h4>
+    <ul>
+      <li>Onboarding équipe</li>
+      <li>Formation</li>
+      <li>Lancement officiel 🎉</li>
+    </ul>
+
+    <h3>11.3 Jalons clés</h3>
+    <table>
+      <thead><tr><th>Jalon</th><th>Date cible</th></tr></thead>
+      <tbody>
+        <tr><td>Validation CDC</td><td>S1</td></tr>
+        <tr><td>Auth fonctionnelle</td><td>S3</td></tr>
+        <tr><td>Projets + tâches OK</td><td>S6</td></tr>
+        <tr><td>Dossiers + messagerie OK</td><td>S9</td></tr>
+        <tr><td>MVP complet</td><td>S12</td></tr>
+        <tr><td>Présentation équipe</td><td>S12</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 12. RESSOURCES ============ -->
+<section id="s12">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <div>
+        <h2>Ressources et budget</h2>
+        <p>Qui fait quoi, combien ça coûte.</p>
+      </div>
+    </div>
+
+    <h3>12.1 Ressources humaines</h3>
+    <table>
+      <thead><tr><th>Rôle</th><th>Personne</th><th>Temps</th></tr></thead>
+      <tbody>
+        <tr><td>Développeur full-stack</td><td>Elhadj Boubacar Diallo</td><td>15–20h/semaine</td></tr>
+        <tr><td>Designer UI/UX</td><td>Elhadj Boubacar Diallo (ou freelance)</td><td>20h au total</td></tr>
+        <tr><td>Testeur</td><td>Elhadj + 1 confident</td><td>Continu</td></tr>
+      </tbody>
+    </table>
+
+    <h3>12.2 Budget mensuel (infrastructure)</h3>
+    <table>
+      <thead><tr><th>Poste</th><th>Coût</th></tr></thead>
+      <tbody>
+        <tr><td>Supabase (Free → Pro)</td><td>0 → 25 €</td></tr>
+        <tr><td>Vercel (Hobby → Pro)</td><td>0 → 20 €</td></tr>
+        <tr><td>Resend (Free tier)</td><td>0 €</td></tr>
+        <tr><td>Nom de domaine</td><td>~1 €/mois</td></tr>
+        <tr><td>Sentry (Free tier)</td><td>0 €</td></tr>
+        <tr><td>Jitsi (self-host)</td><td>0 €</td></tr>
+        <tr><td><strong>Total</strong></td><td><strong>0 à 50 €/mois</strong></td></tr>
+      </tbody>
+    </table>
+
+    <h3>12.3 Budget ponctuel</h3>
+    <table>
+      <thead><tr><th>Poste</th><th>Coût</th></tr></thead>
+      <tbody>
+        <tr><td>Logo / identité visuelle</td><td>0 € (auto) ou 200 €</td></tr>
+        <tr><td>Formation (cours en ligne)</td><td>0 € (ressources gratuites)</td></tr>
+        <tr><td><strong>Total</strong></td><td><strong>0 à 200 €</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 13. LIVRABLES ============ -->
+<section id="s13">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">13</div>
+      <div>
+        <h2>Livrables</h2>
+        <p>Ce qui doit être produit et remis à la fin.</p>
+      </div>
+    </div>
+
+    <h3>13.1 Livrables techniques</h3>
+    <ul class="checklist">
+      <li>Code source sur GitHub (repo privé)</li>
+      <li>Application déployée sur <code>app.linklink.app</code></li>
+      <li>Base de données configurée</li>
+      <li>Documentation technique (README + wiki)</li>
+      <li>Documentation utilisateur (guide PDF)</li>
+      <li>Tests automatisés</li>
+    </ul>
+
+    <h3>13.2 Livrables design</h3>
+    <ul class="checklist">
+      <li>Charte graphique (couleurs, typo, composants)</li>
+      <li>Maquettes Figma (toutes les pages)</li>
+      <li>Bibliothèque de composants</li>
+    </ul>
+
+    <h3>13.3 Livrables projet</h3>
+    <ul class="checklist">
+      <li>Cahier des charges (ce document)</li>
+      <li>Planning détaillé</li>
+      <li>Journal de bord de développement</li>
+      <li>Rapport de tests</li>
+      <li>Guide de déploiement</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 14. TESTS ============ -->
+<section id="s14">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">14</div>
+      <div>
+        <h2>Stratégie de tests et recette</h2>
+        <p>Comment on s'assure que tout fonctionne.</p>
+      </div>
+    </div>
+
+    <h3>14.1 Types de tests</h3>
+    <table>
+      <thead><tr><th>Type</th><th>Objectif</th><th>Outils</th></tr></thead>
+      <tbody>
+        <tr><td>Unitaires</td><td>Tester chaque fonction</td><td>Vitest</td></tr>
+        <tr><td>Intégration</td><td>Tester les interactions</td><td>Vitest + Testing Library</td></tr>
+        <tr><td>E2E</td><td>Tester les parcours utilisateurs</td><td>Playwright</td></tr>
+        <tr><td>Manuels</td><td>Vérifier l'UX</td><td>Checklist</td></tr>
+        <tr><td>Performance</td><td>Vérifier les temps de réponse</td><td>Lighthouse</td></tr>
+        <tr><td>Sécurité</td><td>Vérifier les failles</td><td>OWASP checklist</td></tr>
+      </tbody>
+    </table>
+
+    <h3>14.2 Scénarios critiques à tester</h3>
+    <ol>
+      <li>Inscription → connexion → dashboard</li>
+      <li>Création projet → ajout membre → création tâche</li>
+      <li>Upload fichier → partage → versioning</li>
+      <li>Envoi message → réception temps réel → notification</li>
+      <li>Création RDV → invitation → acceptation → rappel</li>
+      <li>Suppression projet → confirmation → archivage</li>
+    </ol>
+
+    <h3>14.3 Critères d'acceptation</h3>
+    <ul>
+      <li>✅ 100% des scénarios critiques passent</li>
+      <li>✅ 0 bug bloquant</li>
+      <li>✅ Score Lighthouse &gt; 85</li>
+      <li>✅ Audit sécurité OWASP : aucun point critique</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 15. DÉPLOIEMENT ============ -->
+<section id="s15">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">15</div>
+      <div>
+        <h2>Déploiement et mise en production</h2>
+        <p>Comment on livre et on sécurise la mise en ligne.</p>
+      </div>
+    </div>
+
+    <h3>15.1 Processus</h3>
+    <ol>
+      <li><strong>Développement</strong> sur branche <code>dev</code></li>
+      <li><strong>Tests</strong> sur environnement staging</li>
+      <li><strong>Validation</strong> par le fondateur</li>
+      <li><strong>Merge</strong> sur <code>main</code></li>
+      <li><strong>Déploiement automatique</strong> via Vercel</li>
+      <li><strong>Vérification</strong> post-déploiement</li>
+    </ol>
+
+    <h3>15.2 Checklist de mise en production</h3>
+    <ul class="checklist">
+      <li>Variables d'environnement configurées</li>
+      <li>Domaine pointé et SSL actif</li>
+      <li>Backups activés</li>
+      <li>Monitoring Sentry actif</li>
+      <li>Analytics configuré</li>
+      <li>CGU et politique de confidentialité en ligne</li>
+      <li>Test de restauration DB effectué</li>
+    </ul>
+
+    <h3>15.3 Rollback</h3>
+    <ul>
+      <li>Sauvegarde du dernier état stable</li>
+      <li>Redéploiement en 1 clic via Vercel</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 16. MAINTENANCE ============ -->
+<section id="s16">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">16</div>
+      <div>
+        <h2>Maintenance et évolutions</h2>
+        <p>Après le lancement, comment on fait vivre LinkLink.</p>
+      </div>
+    </div>
+
+    <h3>16.1 Maintenance</h3>
+    <table>
+      <thead><tr><th>Type</th><th>Fréquence</th></tr></thead>
+      <tbody>
+        <tr><td>Corrective (bugs)</td><td>À la demande</td></tr>
+        <tr><td>Préventive (mises à jour)</td><td>Mensuelle</td></tr>
+        <tr><td>Évolutive (nouvelles features)</td><td>Trimestrielle</td></tr>
+      </tbody>
+    </table>
+
+    <h3>16.2 Roadmap post-MVP</h3>
+    <h4>V2 (Mois 4–6)</h4>
+    <ul>
+      <li>Portail client</li>
+      <li>Partage externe de fichiers</li>
+      <li>Facturation</li>
+    </ul>
+    <h4>V3 (Mois 7–9)</h4>
+    <ul>
+      <li>Application mobile (PWA)</li>
+      <li>Assistant IA (résumés, suggestions)</li>
+      <li>Intégrations (Google Calendar, Drive)</li>
+    </ul>
+    <h4>V4 (Mois 10–12)</h4>
+    <ul>
+      <li>Automatisations (workflows)</li>
+      <li>Templates avancés</li>
+      <li>API publique</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 17. RISQUES ============ -->
+<section id="s17">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">17</div>
+      <div>
+        <h2>Gestion des risques</h2>
+        <p>Anticiper ce qui peut mal se passer et comment réagir.</p>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Risque</th><th>Probabilité</th><th>Impact</th><th>Mitigation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Retard de développement</td><td><span class="badge risk-med">Moyenne</span></td><td><span class="badge risk-high">Élevé</span></td><td>Prioriser MVP, couper les extras</td></tr>
+        <tr><td>Fuite d'information avant présentation</td><td><span class="badge risk-low">Faible</span></td><td><span class="badge risk-high">Élevé</span></td><td>Repo privé, pas de partage</td></tr>
+        <tr><td>Perte de motivation en solo</td><td><span class="badge risk-med">Moyenne</span></td><td><span class="badge risk-med">Moyen</span></td><td>Découper en petites victoires</td></tr>
+        <tr><td>Bug critique en prod</td><td><span class="badge risk-low">Faible</span></td><td><span class="badge risk-high">Élevé</span></td><td>Tests + staging + backups</td></tr>
+        <tr><td>Dépassement budget</td><td><span class="badge risk-low">Faible</span></td><td><span class="badge risk-low">Faible</span></td><td>Stack gratuite au départ</td></tr>
+        <tr><td>Non-adoption par l'équipe</td><td><span class="badge risk-med">Moyenne</span></td><td><span class="badge risk-high">Élevé</span></td><td>Onboarding + écoute active</td></tr>
+        <tr><td>Problème de sécurité</td><td><span class="badge risk-low">Faible</span></td><td><span class="badge risk-high">Très élevé</span></td><td>Audit OWASP, RLS strict</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 18. ANNEXES ============ -->
+<section id="s18">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-num">18</div>
+      <div>
+        <h2>Annexes</h2>
+        <p>Glossaire, outils, ressources, contacts.</p>
+      </div>
+    </div>
+
+    <h3>18.1 Glossaire</h3>
+    <ul>
+      <li><strong>RLS</strong> : Row Level Security (sécurité par ligne dans Postgres)</li>
+      <li><strong>MVP</strong> : Minimum Viable Product</li>
+      <li><strong>RPO/RTO</strong> : Recovery Point/Time Objective</li>
+      <li><strong>SaaS</strong> : Software as a Service</li>
+    </ul>
+
+    <h3>18.2 Outils recommandés</h3>
+    <ul>
+      <li><strong>Design</strong> : Figma</li>
+      <li><strong>Dev</strong> : VS Code + extensions</li>
+      <li><strong>Versioning</strong> : Git + GitHub</li>
+      <li><strong>Gestion projet</strong> : Notion ou Linear</li>
+      <li><strong>Communication</strong> : Discord (privé, équipe projet)</li>
+    </ul>
+
+    <h3>18.3 Ressources d'apprentissage</h3>
+    <ul>
+      <li>Documentation Next.js</li>
+      <li>Documentation Supabase</li>
+      <li>Chaîne YouTube : "Theo - t3.gg", "Web Dev Simplified"</li>
+      <li>Cours : "Next.js 15 Complete Guide" (Udemy)</li>
+    </ul>
+
+    <h3>18.4 Contacts</h3>
+    <ul>
+      <li><strong>Responsable projet</strong> : Elhadj Boubacar Diallo</li>
+      <li><strong>Email</strong> : [à compléter]</li>
+      <li><strong>Repo</strong> : GitHub privé LinkLink</li>
+    </ul>
+
+    <h3>Validation du cahier des charges</h3>
+    <table>
+      <thead><tr><th>Rôle</th><th>Nom</th><th>Date</th><th>Signature</th></tr></thead>
+      <tbody>
+        <tr><td>Rédacteur</td><td>Elhadj Boubacar Diallo</td><td>12/10/2026</td><td>_______</td></tr>
+        <tr><td>Relecteur</td><td>Elhadj Boubacar Diallo</td><td>12/10/2026</td><td>_______</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout success">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-content">
+        <p><strong>Prochaines étapes immédiates</strong></p>
+        <ol>
+          <li>Relire et valider ce cahier des charges</li>
+          <li>Créer le repo GitHub privé <code>linklink</code></li>
+          <li>Créer le projet Supabase et configurer la DB</li>
+          <li>Initialiser Next.js avec Tailwind + shadcn</li>
+          <li>Créer les maquettes Figma des 5 pages principales</li>
+          <li>Commencer le Sprint 1 (Auth)</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-icon">📌</div>
+      <div class="callout-content">
+        <p>Ce cahier des charges est <strong>vivant</strong> : il évoluera avec le projet. Garde-le à jour à chaque étape.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="logo">
+      <div class="logo-mark">🔗</div>
+      <span>LinkLink</span>
+    </div>
+    <p>Cahier des charges — Version 1.0 — Document de référence</p>
+    <p class="footer-author">Rédigé par Elhadj Boubacar Diallo · 12 octobre 2026</p>
+    <p style="margin-top:20px; font-size:12px; color:#64748b;">© 2026 LinkLink · Document confidentiel</p>
+  </div>
+</footer>
+
+<a href="#" class="back-to-top no-print" id="backToTop">↑</a>
+
+<script>
+  // Back to top button
+  const backToTop = document.getElementById('backToTop');
+  window.addEventListener('scroll', () => {
+    backToTop.classList.toggle('visible', window.scrollY > 500);
+  });
+  backToTop.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+
+</body>
+</html>
